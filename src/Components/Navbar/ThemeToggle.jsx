@@ -3,7 +3,7 @@ export default function ThemeToggle({ currentTheme, onClick }) {
     <div className="flex justify-center">
       <div
         className={`relative w-24 h-10 flex items-center p-1 rounded-full cursor-pointer transition-all duration-500 border-2 ${
-          currentTheme === "LIGHT" ? "bg-gray-900" : "bg-gray-500 border-gray-600"
+          currentTheme === "LIGHT" ? "bg-gray-900" : "bg-gray-600 border-gray-600"
         }` }
         onClick={onClick}
       >
