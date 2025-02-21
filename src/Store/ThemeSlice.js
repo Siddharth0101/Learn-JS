@@ -1,19 +1,15 @@
 const { createSlice } = require("@reduxjs/toolkit");
 
-const ThemeSlice = createSlice({
-    name: "Theme",
-    initialState: {
-        theme: "DARK" // Default value; don't use localStorage here
+const ThemeSlice=createSlice({
+    name:"Theme",
+    initialState:{
+        theme:localStorage.getItem("theme") || "DARK"
     },
-    reducers: {
-        ChangeTheme(state, action) {
-            state.theme = action.payload;
-            if (typeof window !== "undefined") {
-                localStorage.setItem("theme", action.payload);
-            }
+    reducers:{
+        ChangeTheme(state,action) {
+            state.theme=action.payload
         }
     }
-});
-
-export const ThemeActions = ThemeSlice.actions;
-export default ThemeSlice.reducer;
+})
+export const ThemeActions=ThemeSlice.actions
+export default ThemeSlice.reducer
