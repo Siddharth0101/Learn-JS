@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [showAlert, setShowAlert] = useState(false);
-  const [alertKey, setAlertKey] = useState(0); 
+  const [alertKey, setAlertKey] = useState(0);
+  const [isMounted, setIsMounted] = useState(false); // ✅ Prevents hydration issues
   const themeSelect = useSelector((state) => state.Theme.theme);
   const dispatch = useDispatch();
 
@@ -22,7 +23,7 @@ export default function Navbar() {
     "☀️ Light Mode: For those who fear the darkness… or just wanna flex their screen!",
     "🔥 Warning! Light Mode may cause unexpected energy bursts. Proceed with caution!",
   ];
-  
+
   const darkModeMessages = [
     "🌙 Welcome to the dark side... We have cookies! 🍪",
     "🦇 Dark Mode engaged! Time to embrace your inner Batman!",
@@ -34,18 +35,28 @@ export default function Navbar() {
     "🌑 Alert: Dark Mode has been activated. Your screen is now officially *badass*!",
     "🦉 Dark mode activated! Your wisdom level just increased by +100 XP!",
     "👻 Ghost Mode ON. Now you can browse like a shadow in the night! 🌙",
-  ];  
+  ];
 
   const getRandomMessage = (messages) =>
     messages[Math.floor(Math.random() * messages.length)];
 
-  const toggleTheme = () => {
-    const newTheme = themeSelect === "DARK" ? "LIGHT" : "DARK";
-    localStorage.setItem("theme", newTheme);
-    dispatch(ThemeActions.ChangeTheme(newTheme));
+  // ✅ UseEffect to fix hydration issue
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedTheme = localStorage.getItem("theme") || "DARK";
+      dispatch(ThemeActions.ChangeTheme(storedTheme));
+      setIsMounted(true); // ✅ Mark component as mounted to prevent SSR mismatch
+    }
+  }, [dispatch]);
 
-    setShowAlert(true);
-    setAlertKey((prev) => prev + 1);
+  const toggleTheme = () => {
+    if (isMounted) {
+      const newTheme = themeSelect === "DARK" ? "LIGHT" : "DARK";
+      dispatch(ThemeActions.ChangeTheme(newTheme));
+
+      setShowAlert(true);
+      setAlertKey((prev) => prev + 1);
+    }
   };
 
   useEffect(() => {
@@ -60,8 +71,9 @@ export default function Navbar() {
           themeSelect === "LIGHT" ? "bg-gray-500" : "bg-gray-800"
         } p-3`}
       >
-        <ThemeToggle currentTheme={themeSelect} onClick={toggleTheme} />
-        {showAlert && (
+        {/* ✅ Only render after mounting to avoid hydration issues */}
+        {isMounted && <ThemeToggle currentTheme={themeSelect} onClick={toggleTheme} />}
+        {showAlert && isMounted && (
           <Alert
             key={alertKey}
             currentTheme={themeSelect}
