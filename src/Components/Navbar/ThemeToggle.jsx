@@ -1,3 +1,5 @@
+"use client"
+
 export default function ThemeToggle({ currentTheme, onClick }) {
   return (
     <div className="flex justify-center">
